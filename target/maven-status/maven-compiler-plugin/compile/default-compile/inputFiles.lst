@@ -1,0 +1,15 @@
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\core\QuestionPlugin.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\presentation\GUIQuestions.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\pipeline\ContentValidationFilter.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\core\QuestionRequest.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\plugins\CaseQuestionPlugin.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\pipeline\Filter.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\plugins\MultipleChoiceQuestionPlugin.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\core\Question.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\pipeline\Pipeline.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\pipeline\ClassificationFilter.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\pipeline\OptionsValidationFilter.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\plugins\PipelineQuestionPlugin.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\core\QuestionMicrokernel.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\pipeline\CorrectAnswerValidationFilter.java
+C:\Users\julis\Downloads\BancoPreguntas-Taller5\src\main\java\co\unicauca\bancopreguntas\core\QuestionPluginManager.java
