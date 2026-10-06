@@ -1,0 +1,231 @@
+@startuml diagrama-clases
+title Banco de Preguntas Saber Pro - Patrón Builder (Taller 7)
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 70
+skinparam ranksep 70
+skinparam ArrowColor #333333
+skinparam linetype polyline
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #444444
+  StereotypeFontColor #555555
+}
+skinparam package {
+  BackgroundColor #F4F7FB
+  BorderColor #8AA1BD
+}
+skinparam note {
+  BackgroundColor #FFF9DB
+  BorderColor #C9B458
+}
+skinparam legend {
+  BackgroundColor #FFF9DB
+  BorderColor #C9B458
+}
+
+' =========================== CLIENTE ===========================
+class ApplicationMain <<Client>> {
+  + {static} main(args : String[]) : void
+  - {static} print(title : String, question : Question) : void
+}
+
+' =========================== DIRECTOR ==========================
+package director {
+  class QuestionDirector <<Director>> {
+    + QuestionDirector()
+    + QuestionDirector(builder : QuestionBuilder)
+    + setBuilder(builder : QuestionBuilder) : void
+    + getBuilder() : QuestionBuilder
+    + construct(statement, difficulty, category, author,\n justification, source, options, correctAnswer) : Question
+    + constructWithoutSource(statement, difficulty, category,\n author, justification, options, correctAnswer) : Question
+  }
+}
+
+' =========================== BUILDERS ==========================
+package builder {
+  abstract class QuestionBuilder <<Builder>> {
+    + {static} MIN_STATEMENT_LENGTH : int = 10
+    + {static} MAX_STATEMENT_LENGTH : int = 1000
+    + {static} MIN_JUSTIFICATION_LENGTH : int = 10
+    # statement : String
+    # difficulty : DifficultyLevel
+    # category : String
+    # author : String
+    # justification : String
+    # source : String
+    # QuestionBuilder()
+    + reset() : void
+    + buildStatement(statement : String) : void
+    + buildDifficulty(difficulty : DifficultyLevel) : void
+    + buildCategory(category : String) : void
+    + buildAuthor(author : String) : void
+    + buildJustification(justification : String) : void
+    + buildSource(source : String) : void
+    + {abstract} buildOptions(options : List<String>) : void
+    + {abstract} buildCorrectAnswer(answer : String) : void
+    + {abstract} getQuestionType() : QuestionType
+    + build() : Question
+    # {abstract} resetSpecificParts() : void
+    # {abstract} validateSpecificRules() : void
+    # {abstract} createQuestion() : Question
+    - validateCommonRules() : void
+    # {static} requireText(value : String, message : String) : String
+    + toString() : String
+  }
+
+  class MultipleChoiceQuestionBuilder <<ConcreteBuilder>> {
+    + {static} MIN_OPTIONS : int = 3
+    + {static} MAX_OPTIONS : int = 5
+    - optionTexts : List<String>
+    - correctIndex : int
+    + buildOptions(options : List<String>) : void
+    + buildCorrectAnswer(answer : String) : void
+    + getQuestionType() : QuestionType
+    # resetSpecificParts() : void
+    # validateSpecificRules() : void
+    # createQuestion() : Question
+    - findOption(answer : String) : int
+    - {static} labelFor(index : int) : String
+  }
+
+  class TrueFalseQuestionBuilder <<ConcreteBuilder>> {
+    + {static} TRUE_TEXT : String = "Verdadero"
+    + {static} FALSE_TEXT : String = "Falso"
+    - correctValue : Boolean
+    + buildOptions(options : List<String>) : void
+    + buildCorrectAnswer(answer : String) : void
+    + getQuestionType() : QuestionType
+    # resetSpecificParts() : void
+    # validateSpecificRules() : void
+    # createQuestion() : Question
+    - {static} containsIgnoreCase(values : List<String>, expected : String) : boolean
+  }
+
+  class OpenQuestionBuilder <<ConcreteBuilder>> {
+    + {static} MIN_REFERENCE_ANSWER_LENGTH : int = 10
+    - referenceAnswer : String
+    + buildOptions(options : List<String>) : void
+    + buildCorrectAnswer(answer : String) : void
+    + getQuestionType() : QuestionType
+    # resetSpecificParts() : void
+    # validateSpecificRules() : void
+    # createQuestion() : Question
+  }
+}
+
+' =========================== DOMINIO ===========================
+package domain {
+  class Question <<Product>> {
+    - id : String
+    - statement : String
+    - category : String
+    - author : String
+    - justification : String
+    - source : String
+    - referenceAnswer : String
+    - createdAt : LocalDateTime
+    + Question(type, statement, difficulty, category, author,\n justification, source, options, referenceAnswer)
+    + getId() : String
+    + getType() : QuestionType
+    + getStatement() : String
+    + getDifficulty() : DifficultyLevel
+    + getCategory() : String
+    + getAuthor() : String
+    + getJustification() : String
+    + getSource() : String
+    + getOptions() : List<Option>
+    + getReferenceAnswer() : String
+    + getCreatedAt() : LocalDateTime
+    + getCorrectOption() : Optional<Option>
+    + hasOptions() : boolean
+    + toString() : String
+  }
+
+  class Option {
+    - label : String
+    - text : String
+    - correct : boolean
+    + Option(label : String, text : String, correct : boolean)
+    + getLabel() : String
+    + getText() : String
+    + isCorrect() : boolean
+    + equals(o : Object) : boolean
+    + hashCode() : int
+    + toString() : String
+  }
+
+  enum QuestionType {
+    MULTIPLE_CHOICE
+    TRUE_FALSE
+    OPEN
+    - displayName : String
+    + getDisplayName() : String
+  }
+
+  enum DifficultyLevel {
+    LOW
+    MEDIUM
+    HIGH
+    - displayName : String
+    + getDisplayName() : String
+  }
+}
+
+' ========================= RELACIONES ==========================
+' Cliente: variables locales -> dependencias
+ApplicationMain ..> "<<create>>" QuestionDirector
+ApplicationMain ..> "<<create>>" MultipleChoiceQuestionBuilder
+ApplicationMain ..> "<<create>>" TrueFalseQuestionBuilder
+ApplicationMain ..> "<<create>>" OpenQuestionBuilder
+
+' Director: atributo builder -> asociación (agregación)
+QuestionDirector "0..*" o--> "-builder\n0..1" QuestionBuilder
+QuestionDirector ..> "<<use>>" Question
+
+' Herencia de los Builders concretos
+QuestionBuilder <|-- MultipleChoiceQuestionBuilder
+QuestionBuilder <|-- TrueFalseQuestionBuilder
+QuestionBuilder <|-- OpenQuestionBuilder
+
+' Builder abstracto
+QuestionBuilder ..> "<<create>>" Question
+
+' Builders concretos que crean opciones
+MultipleChoiceQuestionBuilder ..> "<<create>>" Option
+TrueFalseQuestionBuilder ..> "<<create>>" Option
+
+' Producto
+Question "1" *--> "-options\n0..5" Option
+Question --> "-type\n1" QuestionType
+Question --> "-difficulty\n1" DifficultyLevel
+
+note right of QuestionDirector
+  Orden de construcción definido por el Director:
+  reset → buildStatement → buildDifficulty →
+  buildCategory → buildAuthor → buildJustification →
+  buildSource → buildOptions → buildCorrectAnswer → build
+  Solo conoce la abstracción QuestionBuilder.
+end note
+
+legend right
+  <b>Reglas de negocio por Builder</b>
+
+  <b>QuestionBuilder</b> (todas): enunciado 10–1000 caracteres;
+  dificultad, competencia y autor obligatorios;
+  justificación ≥ 10 caracteres; fuente opcional.
+
+  <b>MultipleChoiceQuestionBuilder</b>: 3 a 5 opciones (A–E),
+  sin vacías ni repetidas; una única respuesta correcta
+  que corresponde a una opción existente.
+
+  <b>TrueFalseQuestionBuilder</b>: opciones fijas Verdadero/Falso;
+  respuesta obligatoria; el enunciado no termina en "?".
+
+  <b>OpenQuestionBuilder</b>: sin opciones;
+  respuesta de referencia ≥ 10 caracteres.
+endlegend
+@enduml
